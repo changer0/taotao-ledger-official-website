@@ -405,7 +405,7 @@ h1 {
 
 .showcase-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr 0.9fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -421,19 +421,11 @@ h1 {
   box-shadow: var(--shadow-soft);
 }
 
-.showcase-card.large {
-  grid-row: span 2;
-}
-
 .showcase-card img {
   width: min(100%, 300px);
   margin: 0 auto;
   border-radius: 28px;
   box-shadow: 0 16px 32px rgb(104 55 50 / 0.16);
-}
-
-.showcase-card.large img {
-  width: min(100%, 360px);
 }
 
 .showcase-card h3,
@@ -716,7 +708,6 @@ h1 {
     grid-template-columns: 1fr 1fr;
   }
 
-  .showcase-card.large,
   .feature-wide {
     grid-column: span 2;
   }
@@ -785,7 +776,6 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .showcase-card.large,
   .feature-wide,
   .intro-copy {
     grid-column: auto;
