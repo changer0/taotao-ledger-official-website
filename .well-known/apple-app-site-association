@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "QJBFVF4456.com.taotao.ledger",
+        "paths": ["/wechat/*"]
+      }
+    ]
+  }
+}
