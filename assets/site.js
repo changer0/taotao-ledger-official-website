@@ -1,31 +1,55 @@
 (function () {
-  const root = document.documentElement;
-  const toggle = document.querySelector("[data-theme-toggle]");
-  const label = document.querySelector("[data-theme-label]");
-  const storageKey = "taotao-site-theme";
-  const stored = window.localStorage.getItem(storageKey);
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reveals = Array.from(document.querySelectorAll(".reveal"));
 
-  function preferredTheme() {
-    if (stored === "light" || stored === "dark") {
-      return stored;
-    }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    reveals.forEach((element) => element.classList.add("is-visible"));
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        rootMargin: "0px 0px -10% 0px",
+        threshold: 0.12,
+      },
+    );
+
+    reveals.forEach((element) => observer.observe(element));
   }
 
-  function applyTheme(theme) {
-    root.dataset.theme = theme;
-    if (label) {
-      label.textContent = theme === "dark" ? "浅色" : "深色";
-    }
-  }
+  const navLinks = Array.from(document.querySelectorAll('.site-nav a[href^="#"]'));
+  const sections = navLinks
+    .map((link) => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
 
-  applyTheme(preferredTheme());
+  if (sections.length && "IntersectionObserver" in window) {
+    const navObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
 
-  if (toggle) {
-    toggle.addEventListener("click", function () {
-      const next = root.dataset.theme === "dark" ? "light" : "dark";
-      window.localStorage.setItem(storageKey, next);
-      applyTheme(next);
-    });
+        if (!visible) return;
+        navLinks.forEach((link) => {
+          const active = link.getAttribute("href") === `#${visible.target.id}`;
+          if (active) {
+            link.setAttribute("aria-current", "true");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+      },
+      {
+        rootMargin: "-18% 0px -68% 0px",
+        threshold: [0, 0.2, 0.5],
+      },
+    );
+
+    sections.forEach((section) => navObserver.observe(section));
   }
 })();
