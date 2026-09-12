@@ -162,6 +162,28 @@ https://taotao.zhanglulu.com.cn/
 → 浏览器最终验收
 ```
 
+### 6. AASA 发布后检查（iOS Universal Link）
+
+每次改动 `apple-app-site-association` 后，必须验证两条线上路径（iOS 首审依赖）：
+
+```bash
+curl -sSIL https://taotao.zhanglulu.com.cn/.well-known/apple-app-site-association
+curl -sS https://taotao.zhanglulu.com.cn/.well-known/apple-app-site-association
+curl -sSIL https://taotao.zhanglulu.com.cn/apple-app-site-association
+curl -sS https://taotao.zhanglulu.com.cn/apple-app-site-association
+```
+
+判定标准：
+
+- 两条路径均 `HTTP 200`、无 3xx 重定向、TLS 有效。
+- 正文 `"appID"` 为 `"NSJVCX6SBY.com.taotao.ledger"`（与 `Runner.entitlements` 同团队）。
+- 目标响应 `Content-Type` 应为 `application/json`。GitHub Pages 对该无扩展名路径
+  当前返回 `application/octet-stream`；Apple CDN 通常仍可接受，但如 Universal Link
+  真机验证失败，需把这两条精确路径迁移到可控反向代理并固定
+  `Content-Type: application/json`（不得通过加扩展名改变 URL）。
+- Apple CDN 有缓存，发布后最多等待 24 小时再判定失败；最终以
+  「删除 App、重装签名 build、从非受控 App 点击 `/wechat/*` 链接」的真机结果为准。
+
 ## 维护注意
 
 - `index.html` 是官网首页，必须包含应用名称、产品展示、应用介绍、用户协议、版权所有者和联系方式等基础信息。
